@@ -36,7 +36,7 @@ class ExerciseModel (
         return isCompleted
     }
 
-    fun setIsCompleted(id: Boolean){
+    fun setIsCompleted(isCompleted: Boolean){
         this.isCompleted = isCompleted
     }
 

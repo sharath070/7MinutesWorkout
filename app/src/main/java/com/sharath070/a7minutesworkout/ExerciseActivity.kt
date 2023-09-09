@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.View
 import android.widget.EditText
 import android.widget.Toast
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.sharath070.a7minutesworkout.databinding.ActivityExerciseBinding
 import java.util.Locale
 
@@ -31,6 +32,8 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private lateinit var tts: TextToSpeech
     private lateinit var player: MediaPlayer
 
+    private lateinit var exerciseAdapter: ExerciseStatusAdapter
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,7 +51,15 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         tts = TextToSpeech(this, this)
 
         setUpRestView()
+        setUpExerciseRV()
+    }
 
+    private fun setUpExerciseRV(){
+        binding.rvExerciseStatus.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+
+        exerciseAdapter = ExerciseStatusAdapter(exerciseList)
+        binding.rvExerciseStatus.adapter = exerciseAdapter
     }
 
     private fun setUpRestView() {
@@ -119,6 +130,10 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
             override fun onFinish() {
                 currentExercisePosition++
+
+                exerciseList[currentExercisePosition].setIsSelected(true)
+                exerciseAdapter.notifyDataSetChanged()
+
                 setUpExerciseView()
             }
 
@@ -135,6 +150,11 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             }
 
             override fun onFinish() {
+
+                exerciseList[currentExercisePosition].setIsSelected(false)
+                exerciseList[currentExercisePosition].setIsCompleted(true)
+                exerciseAdapter.notifyDataSetChanged()
+
                 if (currentExercisePosition < (exerciseList.size - 1)) {
                     setUpRestView()
                 } else {

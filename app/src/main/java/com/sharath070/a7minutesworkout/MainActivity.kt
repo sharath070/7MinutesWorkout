@@ -21,6 +21,10 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        binding.bmi.setOnClickListener{
+            startActivity(Intent(this, BMI::class.java))
+        }
+
     }
 
     override fun onDestroy() {

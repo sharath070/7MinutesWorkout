@@ -1,5 +1,7 @@
 package com.sharath070.a7minutesworkout
 
+import android.app.Dialog
+import android.content.Intent
 import android.media.MediaPlayer
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
@@ -12,6 +14,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.sharath070.a7minutesworkout.databinding.ActivityExerciseBinding
+import com.sharath070.a7minutesworkout.databinding.DialogCustomBackConfirmationBinding
 import java.util.Locale
 
 class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
@@ -43,7 +46,7 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         binding.toolbar.setNavigationOnClickListener {
-            onBackPressed()
+            customDialogForBackButton()
         }
 
         exerciseList = Constants.defaultExerciseList()
@@ -52,6 +55,25 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
         setUpRestView()
         setUpExerciseRV()
+    }
+
+    private fun customDialogForBackButton() {
+        val customDialog = Dialog(this)
+        val dialogBinding = DialogCustomBackConfirmationBinding.inflate(layoutInflater)
+        customDialog.setContentView(dialogBinding.root)
+        customDialog.setCanceledOnTouchOutside(false)
+        dialogBinding.tvYes.setOnClickListener {
+            this@ExerciseActivity.finish()
+            customDialog.dismiss()
+        }
+        dialogBinding.tvNo.setOnClickListener {
+            customDialog.dismiss()
+        }
+        customDialog.show()
+    }
+
+    override fun onBackPressed() {
+        customDialogForBackButton()
     }
 
     private fun setUpExerciseRV(){
@@ -142,7 +164,7 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
     private fun setExerciseProgressBar() {
         binding.progressBarExercise.progress = exerciseProgress
-        exerciseTimer = object : CountDownTimer(3000, 1000) {
+        exerciseTimer = object : CountDownTimer(1000, 1000) {
             override fun onTick(p0: Long) {
                 exerciseProgress++
                 binding.progressBarExercise.progress = 30 - exerciseProgress
@@ -151,18 +173,15 @@ class ExerciseActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
             override fun onFinish() {
 
-                exerciseList[currentExercisePosition].setIsSelected(false)
-                exerciseList[currentExercisePosition].setIsCompleted(true)
-                exerciseAdapter.notifyDataSetChanged()
-
                 if (currentExercisePosition < (exerciseList.size - 1)) {
+                    exerciseList[currentExercisePosition].setIsSelected(false)
+                    exerciseList[currentExercisePosition].setIsCompleted(true)
+                    exerciseAdapter.notifyDataSetChanged()
                     setUpRestView()
                 } else {
-                    Toast.makeText(
-                        this@ExerciseActivity,
-                        "Congratulations!, You have completed the 7 minutes workout.",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    finish()
+                    val intent = Intent(this@ExerciseActivity, FinishActivity::class.java)
+                    startActivity(intent)
                 }
             }
 
